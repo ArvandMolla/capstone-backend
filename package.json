@@ -1,0 +1,37 @@
+{
+  "name": "capstone-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon  -e   js   -r   dotenv/config    ./src/server.js",
+    "start": "node ./src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArvandMolla/capstone-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ArvandMolla/capstone-backend/issues"
+  },
+  "homepage": "https://github.com/ArvandMolla/capstone-backend#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-validator": "^6.12.1",
+    "fs-extra": "^10.0.0",
+    "http-errors": "^1.8.0",
+    "mongoose": "^5.13.5",
+    "multer": "^1.4.2",
+    "query-to-mongo": "^0.10.1"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.12"
+  }
+}
