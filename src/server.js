@@ -1,62 +1,46 @@
 import express from "express";
-import { format } from "util";
-import Multer from "multer";
-import { Storage } from "@google-cloud/storage";
-import analyzeLabelsGCS from "./analyze.js";
-// const { format } = require("util");
-// const express = require("express");
-// const Multer = require("multer");
-// const { Storage } = require("@google-cloud/storage");
-
-const storage = new Storage();
+import cors from "cors";
+import allRouters from "./api/index.js";
+import { errorHandler } from "./util/errorHandler.js";
+import mongoose from "mongoose";
 
 const app = express();
 app.set("view engine", "pug");
 
+const whiteList = [
+  process.env.FRONTEND_DEV_URL,
+  process.env.FRONTEND_CLOUD_URL,
+];
+const corsOptions = {
+  origin: function (origin, next) {
+    console.log("ORIGIN ", origin);
+    if (whiteList.indexOf(origin) !== -1) {
+      next(null, true);
+    } else {
+      next(new Error("CORS TROUBLES!!!!!"));
+    }
+  },
+};
+
+// middlewares ***********************
 app.use(express.json());
+app.use(cors(corsOptions));
+// routers ****************************
+app.use("/api", allRouters);
+// errorHandlers **********************
+app.use(errorHandler);
 
-const multer = Multer({
-  storage: Multer.memoryStorage(),
-  //   limits: {
-  //     fileSize: 10 * 1024 * 1024,
-  //   },
-});
+const port = process.env.PORT;
 
-const bucket = storage.bucket("strive-proj");
-
-app.post("/upload", multer.single("file"), (req, res, next) => {
-  console.log("here");
-  if (!req.file) {
-    res.status(400).send("No file uploaded.");
-    return;
-  }
-  const blob = bucket.file(req.file.originalname);
-  const blobStream = blob.createWriteStream();
-
-  blobStream.on("error", (err) => {
-    next(err);
-  });
-
-  blobStream.on("finish", () => {
-    const publicUrl = format(
-      `https://storage.cloud.google.com/${bucket.name}/${blob.name}`
-    );
-    // res.status(200).send(publicUrl);
-
-    const labelsAnalyzer = async () => {
-      const data = await analyzeLabelsGCS(
-        `gs://strive-proj/${req.file.originalname}`
-      );
-      res.send(data);
-    };
-
-    labelsAnalyzer();
-  });
-
-  blobStream.end(req.file.buffer);
-});
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+mongoose
+  .connect(process.env.MONGO_CONNECTION, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+  })
+  .then(
+    app.listen(port, () => {
+      console.log("✅✅✅ Running on port", port);
+    })
+  )
+  .catch((err) => console.log(err));
