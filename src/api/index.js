@@ -1,10 +1,14 @@
 import express from "express";
-import videoRouter from "./GCSuploader.js";
-import analyzeRouter from "./analyzeAPI.js";
+import videoRouter from "./videoUploader.js";
+import analyzeRouter from "./videoAnalyzeAPI.js";
+import textRouter from "./textAnalyzeAPI.js";
+import adRouter from "./adsAPI.js";
 
 const allRouters = express.Router();
 
 allRouters.use("/video", videoRouter);
 allRouters.use("/video", analyzeRouter);
+allRouters.use("/text", textRouter);
+allRouters.use("/ad", adRouter);
 
 export default allRouters;
