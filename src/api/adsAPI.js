@@ -15,4 +15,17 @@ adRouter.post("/post", async (req, res, next) => {
   }
 });
 
+adRouter.get("/", async (req, res, next) => {
+  try {
+    const data = await adModel.find();
+    if (data) {
+      res.status(200).send(data);
+    } else {
+      res.status(200).send("no ad is available");
+    }
+  } catch (error) {
+    next(createError(500, error));
+  }
+});
+
 export default adRouter;
