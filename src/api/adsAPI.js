@@ -17,11 +17,40 @@ adRouter.post("/post", async (req, res, next) => {
 
 adRouter.get("/", async (req, res, next) => {
   try {
-    const data = await adModel.find().sort({ updatedAt: -1 });
+    const skipCalculator = () => {
+      if (req.query.page) {
+        return (req.query.page - 1) * 8;
+      } else {
+        return "";
+      }
+    };
+
+    const data = await adModel
+      .find()
+      .sort({ updatedAt: -1 })
+      .skip(skipCalculator())
+      .limit(8);
+    const total = await adModel.countDocuments();
+
+    if (data) {
+      res.status(200).send({ total, data });
+      console.log(req.query);
+      console.log("skip: ", skipCalculator());
+    } else {
+      res.status(404).send("no ad is available");
+    }
+  } catch (error) {
+    next(createError(500, error));
+  }
+});
+
+adRouter.get("/details/:id", async (req, res, next) => {
+  try {
+    const data = await adModel.findById(req.params.id);
     if (data) {
       res.status(200).send(data);
     } else {
-      res.status(200).send("no ad is available");
+      res.status(404).send("ad not found!");
     }
   } catch (error) {
     next(createError(500, error));
@@ -30,6 +59,13 @@ adRouter.get("/", async (req, res, next) => {
 
 adRouter.get("/result", async (req, res, next) => {
   try {
+    const skipCalculator = () => {
+      if (req.query.page) {
+        return (req.query.page - 1) * 8;
+      } else {
+        return "";
+      }
+    };
     const query = q2m(req.query);
     console.log(query);
 
@@ -52,8 +88,8 @@ adRouter.get("/result", async (req, res, next) => {
     const data = await adModel
       .find(criteria)
       .sort({ updatedAt: -1 })
-      .skip(query.options.skip)
-      .limit(query.options.limit);
+      .skip(skipCalculator())
+      .limit(8);
 
     const total = await adModel.countDocuments(criteria);
     console.log("this is criteria:  ", criteria);
