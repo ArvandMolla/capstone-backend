@@ -2,10 +2,11 @@ import express from "express";
 import adModel from "../models/ad.js";
 import createError from "http-errors";
 import q2m from "query-to-mongo";
+import { JWTAuthMiddleware } from "../auth/jwt.js";
 
 const adRouter = express.Router();
 
-adRouter.post("/post", async (req, res, next) => {
+adRouter.post("/post", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const newAd = new adModel(req.body);
     const createdAd = await newAd.save();
