@@ -32,6 +32,16 @@ userRouter.post("/register", async (req, res, next) => {
   }
 });
 
+userRouter.get("/is-loggedin", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    if (req.user) {
+      res.status(200).send(true);
+    }
+  } catch (error) {
+    next(createError(error));
+  }
+});
+
 userRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const data = await userModel.find();
