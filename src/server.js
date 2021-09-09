@@ -3,6 +3,9 @@ import cors from "cors";
 import allRouters from "./api/index.js";
 import { errorHandler } from "./util/errorHandler.js";
 import mongoose from "mongoose";
+import passport from "passport";
+import googleOauth from "./auth/googleOauth.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 app.set("view engine", "pug");
@@ -20,12 +23,15 @@ const corsOptions = {
       next(new Error("CORS TROUBLES!!!!!"));
     }
   },
+  credentials: true,
 };
 
 // middlewares ***********************
-app.use(express.json());
 app.use(cors(corsOptions));
+app.use(express.json());
+app.use(cookieParser());
 // routers ****************************
+app.use(passport.initialize());
 app.use("/api", allRouters);
 // errorHandlers **********************
 app.use(errorHandler);

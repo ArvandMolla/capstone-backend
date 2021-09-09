@@ -2,6 +2,7 @@ import express from "express";
 import userModel from "../models/user.js";
 import createError from "http-errors";
 import { JWTAuth, JWTAuthMiddleware } from "../auth/jwt.js";
+import passport from "passport";
 
 const userRouter = express.Router();
 
@@ -50,5 +51,27 @@ userRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
     next(createError(500, error));
   }
 });
+
+// Google Login
+
+userRouter.get(
+  "/google-login",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+userRouter.get(
+  "/google-redirect",
+  passport.authenticate("google"),
+  async (req, res, next) => {
+    try {
+      // res.cookie("token", req.user.token, { httpOnly: true });
+      res
+        .status(200)
+        .redirect(`http://localhost:3000/from-google?token=${req.user.token}`);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 export default userRouter;

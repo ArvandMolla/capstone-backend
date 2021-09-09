@@ -35,8 +35,6 @@ adRouter.get("/", async (req, res, next) => {
 
     if (data) {
       res.status(200).send({ total, data });
-      console.log(req.query);
-      console.log("skip: ", skipCalculator());
     } else {
       res.status(404).send("no ad is available");
     }
@@ -68,7 +66,6 @@ adRouter.get("/result", async (req, res, next) => {
       }
     };
     const query = q2m(req.query);
-    console.log(query);
 
     let criteria = {};
     if (req.query.search) {
@@ -93,7 +90,6 @@ adRouter.get("/result", async (req, res, next) => {
       .limit(8);
 
     const total = await adModel.countDocuments(criteria);
-    console.log("this is criteria:  ", criteria);
 
     res.send({ total, links: query.links("/result", total), data });
   } catch (error) {
