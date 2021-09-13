@@ -97,4 +97,75 @@ adRouter.get("/result", async (req, res, next) => {
   }
 });
 
+// Comments
+
+//Getting all comments of an ad
+adRouter.get("/:id/comments", async (req, res, next) => {
+  try {
+    const ad = await adModel.findById(req.params.id);
+
+    if (ad) {
+      res.status(200).send(ad.comments);
+    } else {
+      next(createError(404, "ad id not found!"));
+    }
+  } catch (error) {
+    next(createError(500, error));
+  }
+});
+
+//Adding a new comment to an ad
+adRouter.put("/:id/new-comment", async (req, res, next) => {
+  try {
+    const ad = await adModel.findById(req.params.id);
+    let comments = ad.comments;
+    comments.push(req.body);
+
+    const newAdObj = {
+      title: ad.title,
+      transcript: ad.transcript,
+      brand: ad.brand,
+      videoUrl: ad.videoUrl,
+      labels: ad.labels,
+      user: ad.user,
+      comments: comments,
+    };
+
+    const newAd = await adModel.findByIdAndUpdate(req.params.id, newAdObj, {
+      new: true,
+    });
+
+    res.status(200).send(newAd);
+  } catch (error) {
+    next(createError(500, error));
+  }
+});
+
+//Removing a comment from an ad: the comment Id is comming in the req body
+adRouter.put("/:id/delete-comment", async (req, res, next) => {
+  try {
+    const ad = await adModel.findById(req.params.id);
+    let oldComments = ad.comments;
+    let newComments = oldComments.filter((elem) => elem._id != req.body.id);
+
+    const newAdObj = {
+      title: ad.title,
+      transcript: ad.transcript,
+      brand: ad.brand,
+      videoUrl: ad.videoUrl,
+      labels: ad.labels,
+      user: ad.user,
+      comments: newComments,
+    };
+
+    const newAd = await adModel.findByIdAndUpdate(req.params.id, newAdObj, {
+      new: true,
+    });
+
+    res.status(200).send(newAd);
+  } catch (error) {
+    next(createError(500, error));
+  }
+});
+
 export default adRouter;
