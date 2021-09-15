@@ -28,7 +28,7 @@ adRouter.get("/", async (req, res, next) => {
 
     const data = await adModel
       .find()
-      .sort({ updatedAt: -1 })
+      .sort({ createdAt: -1 })
       .skip(skipCalculator())
       .limit(8);
     const total = await adModel.countDocuments();
@@ -45,7 +45,7 @@ adRouter.get("/", async (req, res, next) => {
 
 adRouter.get("/details/:id", async (req, res, next) => {
   try {
-    const data = await adModel.findById(req.params.id);
+    const data = await adModel.findById(req.params.id).populate("user");
     if (data) {
       res.status(200).send(data);
     } else {
@@ -85,7 +85,7 @@ adRouter.get("/result", async (req, res, next) => {
 
     const data = await adModel
       .find(criteria)
-      .sort({ updatedAt: -1 })
+      .sort({ createdAt: -1 })
       .skip(skipCalculator())
       .limit(8);
 
@@ -102,7 +102,13 @@ adRouter.get("/result", async (req, res, next) => {
 //Getting all comments of an ad
 adRouter.get("/:id/comments", async (req, res, next) => {
   try {
-    const ad = await adModel.findById(req.params.id);
+    const ad = await adModel.findById(req.params.id).populate({
+      path: "comments",
+      populate: {
+        path: "sender",
+        model: "User",
+      },
+    });
 
     if (ad) {
       res.status(200).send(ad.comments);
@@ -119,7 +125,7 @@ adRouter.put("/:id/new-comment", async (req, res, next) => {
   try {
     const ad = await adModel.findById(req.params.id);
     let comments = ad.comments;
-    comments.push(req.body);
+    const newComments = [...comments, req.body];
 
     const newAdObj = {
       title: ad.title,
@@ -128,7 +134,9 @@ adRouter.put("/:id/new-comment", async (req, res, next) => {
       videoUrl: ad.videoUrl,
       labels: ad.labels,
       user: ad.user,
-      comments: comments,
+      comments: newComments,
+      createdAt: ad.createdAt,
+      updatedAt: ad.updatedAt,
     };
 
     const newAd = await adModel.findByIdAndUpdate(req.params.id, newAdObj, {
@@ -147,6 +155,21 @@ adRouter.put("/:id/delete-comment", async (req, res, next) => {
     const ad = await adModel.findById(req.params.id);
     let oldComments = ad.comments;
     let newComments = oldComments.filter((elem) => elem._id != req.body.id);
+    let finalComments = [];
+
+    if (newComments.length > 0) {
+      newComments.forEach((elem) => {
+        if (!elem.replyTo) {
+          finalComments.push(elem);
+        } else {
+          newComments.forEach((elem2) => {
+            if (elem.replyTo === elem2._id) {
+              finalComments.push(elem);
+            }
+          });
+        }
+      });
+    }
 
     const newAdObj = {
       title: ad.title,
@@ -155,7 +178,7 @@ adRouter.put("/:id/delete-comment", async (req, res, next) => {
       videoUrl: ad.videoUrl,
       labels: ad.labels,
       user: ad.user,
-      comments: newComments,
+      comments: finalComments,
     };
 
     const newAd = await adModel.findByIdAndUpdate(req.params.id, newAdObj, {
