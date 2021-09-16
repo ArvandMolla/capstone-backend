@@ -12,6 +12,7 @@ passport.use(
       callbackURL: "http://localhost:5000/api/user/google-redirect",
     },
     async (accessToken, refreshToken, profile, next) => {
+      console.log(profile);
       try {
         const user = await userModel.findOne({ googleId: profile.id });
 
@@ -23,6 +24,7 @@ passport.use(
             name: profile.displayName,
             email: profile._json.email,
             googleId: profile.id,
+            avatar: profile._json.picture,
           };
 
           const createdUser = new userModel(newUser);

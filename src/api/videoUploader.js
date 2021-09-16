@@ -34,7 +34,7 @@ videoRouter.post("/upload", multer.single("video"), (req, res, next) => {
 
   blobStream.on("finish", () => {
     const publicUrl = format(
-      `https://storage.cloud.google.com/${bucket.name}/${blob.name}`
+      `https://storage.googleapis.com/${bucket.name}/${blob.name}`
     );
     res.status(200).send({ publicUrl, randomFileName });
     console.log("video uploaded successfully");

@@ -9,6 +9,7 @@ const userSchema = new Schema(
     email: { type: String, required: true },
     password: { type: String },
     googleId: { type: String },
+    avatar: { type: String },
   },
   { timestamps: true }
 );
