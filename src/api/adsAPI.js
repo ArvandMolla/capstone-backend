@@ -20,7 +20,7 @@ adRouter.get("/", async (req, res, next) => {
   try {
     const skipCalculator = () => {
       if (req.query.page) {
-        return (req.query.page - 1) * 8;
+        return (req.query.page - 1) * 16;
       } else {
         return "";
       }
@@ -30,7 +30,7 @@ adRouter.get("/", async (req, res, next) => {
       .find()
       .sort({ createdAt: -1 })
       .skip(skipCalculator())
-      .limit(8);
+      .limit(16);
     const total = await adModel.countDocuments();
 
     if (data) {
@@ -60,7 +60,7 @@ adRouter.get("/result", async (req, res, next) => {
   try {
     const skipCalculator = () => {
       if (req.query.page) {
-        return (req.query.page - 1) * 8;
+        return (req.query.page - 1) * 16;
       } else {
         return "";
       }
@@ -87,7 +87,7 @@ adRouter.get("/result", async (req, res, next) => {
       .find(criteria)
       .sort({ createdAt: -1 })
       .skip(skipCalculator())
-      .limit(8);
+      .limit(16);
 
     const total = await adModel.countDocuments(criteria);
 

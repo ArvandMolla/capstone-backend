@@ -67,7 +67,9 @@ userRouter.get(
       // res.cookie("token", req.user.token, { httpOnly: true });
       res
         .status(200)
-        .redirect(`http://localhost:3000/from-google?${req.user.token}`);
+        .redirect(
+          `${process.env.FRONTEND_CLOUD_URL}/from-google?${req.user.token}`
+        );
     } catch (error) {
       next(error);
     }
