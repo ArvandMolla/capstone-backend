@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const { Schema, model } = mongoose;
+const { Schema } = mongoose;
 
 export const commentSchema = new Schema({
   sender: { type: Schema.Types.ObjectId, required: true, ref: "User" },
