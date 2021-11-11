@@ -4,8 +4,6 @@ import allRouters from "./api/index.js";
 import { errorHandler } from "./util/errorHandler.js";
 import mongoose from "mongoose";
 import passport from "passport";
-import googleOauth from "./auth/googleOauth.js";
-import cookieParser from "cookie-parser";
 
 const app = express();
 app.set("view engine", "pug");
