@@ -64,7 +64,6 @@ userRouter.get(
   passport.authenticate("google"),
   async (req, res, next) => {
     try {
-      // res.cookie("token", req.user.token, { httpOnly: true });
       res
         .status(200)
         .redirect(
